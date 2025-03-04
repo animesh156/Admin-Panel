@@ -4,6 +4,11 @@ const dotenv = require("dotenv").config();
 const port = process.env.PORT;
 const cookieParser = require("cookie-parser");
 var cors = require("cors");
+const connectDB = require("./config/db");
+const { protect } = require("./middleware/authMiddleware");
+
+
+connectDB();
 
 app.use(cors());
 
