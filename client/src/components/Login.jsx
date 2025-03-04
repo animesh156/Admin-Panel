@@ -54,7 +54,7 @@ function Login() {
 
     >
       <ToastContainer />
-      <div className="bg-neutral-950 md:mt-28 h-80 mt-16 rounded-md flex flex-col m-auto p-8 w-96">
+      <div className="bg-neutral-950 md:mt-28  mt-16 rounded-md flex flex-col m-auto p-8 w-72 md:w-96">
         <h1 className="text-center text-2xl mb-3 font-bold text-white">Login</h1>
 
         <form onSubmit={handleSubmit} className="space-y-8">
