@@ -17,63 +17,12 @@ const generateToken = (res, userId) => {
     });
 };
 
-
-
-
-// @desc Login a new uer
-// @route POST /auth/login
+// @desc Register a new uer
+// @route POST /auth/register
 // @access Public
-const loginAdmin = async (req,res) => {
-   
-    const {email, password} = req.body;
-    const admin = await Admin.findOne({email})
- 
-    if(user && (await bcrypt.compare(password, admin.password))) {
-     generateToken(res, user._id);
-     res.json({
-         _id: admin._id,
-         name: admin.name,
-         email: admin.email,
-         role: admin.role
-     });
-    } else {
-     return res.status(400).json({error: "Invalid credentials"})
-    }
- }
-
-
- // Update Profile
-  const updateProfile = async (req, res) => {
-    const { name } = req.body;
-    const updatedAdmin = await Admin.findByIdAndUpdate(req.admin.id, { name }, { new: true });
-  
-    res.json({ message: "Profile updated", admin: updatedAdmin });
-  };
-  
-  // Update Profile Picture
-   const updateProfilePicture = async (req, res) => {
-    try {
-        const profilePictureUrl = req.file.path;
-        const updatedAdmin = await Admin.findByIdAndUpdate(
-          req.admin.id,
-          { profilePicture: profilePictureUrl },
-          { new: true }
-        );
-    
-        res.json({ message: "Profile picture updated successfully", admin: updatedAdmin });
-      } catch (error) {
-        res.status(500).json({ message: "Error updating profile picture", error: error.message });
-      }
-  };
-
-
-
-  // @desc Register admin(1 time only )
-// @route POST /auth/register(temporary route)
-// @access private
 const registerAdmin = async (req,res) => {
     
-    const {name,email, password, profilePicture} = req.body;
+    const {name,email, password,profilePicture} = req.body;
 
     
 
@@ -82,10 +31,10 @@ const registerAdmin = async (req,res) => {
     }
 
 
-    const adminExists = await Admin.findOne({email})
+    const userExists = await Admin.findOne({email})
 
-    if(adminExists){
-        return res.status(400).json({error: "Admin already exist"})
+    if(userExists){
+        return res.status(400).json({error: "User already exist"})
     }
     
 
@@ -93,19 +42,21 @@ const registerAdmin = async (req,res) => {
     const salt = await bcrypt.genSalt(10);
     const hashedPassword = await bcrypt.hash(password,salt)
      
-    const admin = await Admin.create({
+    const user = await Admin.create({
         name,
         email,
         password: hashedPassword,
        profilePicture
     })
 
-    if(admin) {
-        generateToken(res, admin._id);
+    if(user) {
+        generateToken(res, user._id);
         res.status(201).json({
-            Id: admin._id,
-            name: admin.name,
-            email: admin.email,
+            Id: user._id,
+            name: user.name,
+            email: user.email,
+          profilePic: profilePicture
+
         });
     } else {
         res.status(400).json("Invalid user data")
@@ -115,13 +66,69 @@ const registerAdmin = async (req,res) => {
 
 
 
+// @desc Login a new uer
+// @route POST /auth/login
+// @access Public
+const loginAdmin = async (req,res) => {
+   
+   const {email, password} = req.body;
+   const user = await Admin.findOne({email})
+
+   if(user && (await bcrypt.compare(password, user.password))) {
+    generateToken(res, user._id);
+    res.json({
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        profilePic: user.profilePicture
+    });
+   } else {
+    return res.status(400).json({error: "Invalid credentials"})
+   } 
+}
 
 
+const updateProfilePicture = async (req, res) => {
+  try {
+    const { profilePicture } = req.body;
+    if (!profilePicture) {
+      return res.status(400).json({ error: "No image URL provided" });
+    }
+
+    const updatedAdmin = await Admin.findByIdAndUpdate(
+      req.user._id,
+      { profilePicture },
+      { new: true }
+    );
+
+    res.json({ message: "Profile picture updated successfully", admin: updatedAdmin });
+  } catch (error) {
+    console.error("Error updating profile picture:", error);
+    res.status(500).json({ error: "Server error" });
+  }
+};
+
+
+
+
+// LogOUT User
+const logoutUser = async (req,res) => {
+       res.cookie("jwt", "", {httpOnly: true, expiress: new Date(0)})
+       res.json({message: "Logged out successfully"})
+}
  
 
- module.exports = {
-    loginAdmin,
-    updateProfile,
-    updateProfilePicture,
-    registerAdmin
- }
+ const updateProfile = async (req, res) => {
+    const { name } = req.body;
+    const updatedAdmin = await Admin.findByIdAndUpdate(req.user._id, { name }, { new: true });
+  
+    res.json({ message: "Profile updated", admin: updatedAdmin.name });
+  };
+  
+
+
+
+
+module.exports = {
+    registerAdmin, loginAdmin, logoutUser, updateProfilePicture,updateProfile
+}

@@ -1,12 +1,20 @@
-const express = require('express')
-const router = express.Router()
-const {loginAdmin, updateProfile, updateProfilePicture, registerAdmin} = require('../controllers/adminController')
-const {upload} = require('../middleware/uploadMiddleware')
+const express = require("express");
+const router = express.Router();
+const {
+  loginAdmin,
+  registerAdmin,
+  logoutUser,
+  updateProfile,
+  updateProfilePicture 
+} = require("../controllers/adminController");
+
+const { protect } = require("../middleware/authMiddleware");
 
 
 router.post("/login", loginAdmin);
-router.put("/update-profile", updateProfile);
-router.put("/update-profile-picture", upload.single("profilePicture"), updateProfilePicture);
-router.post("/register", registerAdmin)
+router.put("/update-profile",protect, updateProfile);
+router.put("/update-profile-picture",protect, updateProfilePicture);
+router.post("/register", registerAdmin);
+router.post("/logout",protect, logoutUser);
 
 module.exports = router;
