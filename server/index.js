@@ -6,6 +6,7 @@ const cookieParser = require("cookie-parser");
 var cors = require("cors");
 const connectDB = require("./config/db");
 const { protect } = require("./middleware/authMiddleware");
+const adminRoutes = require('./routes/adminRoutes')
 
 
 connectDB();
@@ -15,8 +16,6 @@ app.use(cors());
 app.use(express.json());
 app.use(cookieParser());
 
-app.get("/", (req, res) => {
-  res.json("Admin");
-});
+app.use('/admin', adminRoutes)
 
 app.listen(port, () => console.log(`Server started at ${port}`));
