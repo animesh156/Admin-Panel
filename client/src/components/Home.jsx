@@ -18,7 +18,7 @@ const Dashboard = () => {
 
   if (!isAuthenticated) {
     navigate("/login");
-    return null;
+    
   }
 
   const handleLogout = async () => {
