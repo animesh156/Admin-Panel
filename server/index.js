@@ -13,7 +13,7 @@ connectDB();
 
 app.use(
     cors({
-        origin: ["http://localhost:5173"],
+        origin: ["https://admin-panel-42zh.vercel.app"],
         credentials: true,
       })
 );
