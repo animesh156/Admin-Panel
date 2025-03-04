@@ -1,7 +1,7 @@
 import axios from "axios";
 
 const API = axios.create({
-  baseURL: "http://localhost:6224/admin", // for development
+  baseURL: "https://admin-panel-backend-xi.vercel.app/admin",
 
   withCredentials: true,
 });
